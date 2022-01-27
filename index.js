@@ -4,6 +4,7 @@ var cheerio = require('cheerio');
 var app = express();
 
 app.get("/check", (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     var address = req.query.address;
     var result = {}
     var url0 = "https://places.nbnco.net.au/places/v1/autocomplete?query=" + address;
