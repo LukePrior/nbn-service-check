@@ -3,28 +3,18 @@ var request = require('request');
 var cheerio = require('cheerio');
 var app = express();
 
-function postURL(url, data, callback) {
-    request.post({
-        url: url,
-        form: data
-    }, function(error, response, body){
-        return callback(body); 
-    });
-}
-
 app.get("/check", (req, res) => {
     var address = req.query.address;
     var result = {}
-    var url0 = "https://residential.launtel.net.au/search_address";
-    var data0 = {"term": address}
-    postURL(url0, data0, function(response0) {
-        response0 = JSON.parse(response0);
-        result.label = response0[0].label;
-        result.locid = response0[0].locid;
+    var url0 = "https://places.nbnco.net.au/places/v1/autocomplete?query=" + address;
+    request(url0, {headers: {"Referer": "https://www.nbnco.com.au/when-do-i-get-it/rollout-map.html"}}, function (error, response, body0) {
+        body0 = JSON.parse(body0);
+        result.label = body0.suggestions[0].formattedAddress;
+        result.locid = body0.suggestions[0].id;
         var url1 = "https://order.au.myrepublic.net/address/info?address=" + result.locid;
-        request(url1, function (error, response, body) {
-            body = JSON.parse(body);
-            result.body = body;
+        request(url1, function (error, response, body1) {
+            body1 = JSON.parse(body1);
+            result.body = body1;
             res.send(result);
         });
     })
