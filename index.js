@@ -45,7 +45,7 @@ function myRepublicLookup(locID, callback) {
             callback(result, false);
             return;
         }
-        result.body = body;
+        result = body;
         callback(result, true);
         return;
     });
@@ -75,8 +75,6 @@ function unitiWirelessLookup(address, callback) {
         return;
     });
 }
-
-var unitiMatchTechnology = {"OC": {"name": "Private Network", "technology": "Fibre To The Premises", "speed": 1000}};
 
 app.get("/check", (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
