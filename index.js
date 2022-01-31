@@ -99,8 +99,11 @@ app.get("/check", (req, res) => {
                                 result.body.lowerSpeed = 100;
                                 result.body.upperSpeed = 1000;
                                 result.body.networkCoexistence = "";
+                                res.send(result);
+                            } else {
+                                res.status(400);
+                                res.send('Could not find match');
                             }
-                            res.send(result);
                         } else {
                             res.status(400);
                             res.send('Could not find match');
