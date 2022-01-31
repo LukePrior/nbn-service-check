@@ -101,12 +101,16 @@ app.get("/check", (req, res) => {
                                 result.body.networkCoexistence = "";
                             }
                             res.send(result);
+                        } else {
+                            res.status(400);
+                            res.send('Could not find match');
                         }
                     })
                 }
             });
         } else { // NBN could not match address
-
+            res.status(400);
+            res.send('Could not find match');
         }      
     });
 });
