@@ -95,7 +95,7 @@ app.get("/check", (req, res) => {
                             result.body = {};
                             if (data.carrier == "OC") {
                                 result.body.provider = "Private Network";
-                                result.body.primaryAccessTechnology = "Fibre To The Premises";
+                                result.body.primaryAccessTechnology = "Fibre";
                                 result.body.lowerSpeed = 100;
                                 result.body.upperSpeed = 1000;
                                 result.body.networkCoexistence = "";
