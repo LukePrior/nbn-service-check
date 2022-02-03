@@ -3,5 +3,11 @@
       "api/check.ts": {
         "memory": 256
       }
-    }
+    },
+    "redirects": [
+      { 
+        "source": "/check",
+        "destination": "/api/check"
+      }
+    ]
 }
