@@ -172,7 +172,7 @@ function unitiwirelessProcess(address, callback) {
     })
 }
 
-app.get("/check", (req, res) => {
+export default function check(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     var address = req.query.address;
     var result = {}
@@ -210,6 +210,4 @@ app.get("/check", (req, res) => {
             });
         }      
     });
-});
-
-app.listen(3000);
+};
