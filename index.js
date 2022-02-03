@@ -20,8 +20,13 @@ function nbnAutoComplete(address, callback) {
             return;
         }
         if (body.suggestions.length != 0) {
-            result.label = body.suggestions[0].formattedAddress;
-            result.locid = body.suggestions[0].id;
+            if (body.suggestions[0].id.startsWith("LOC")) {
+                result.label = body.suggestions[0].formattedAddress;
+                result.locid = body.suggestions[0].id;
+            } else {
+                callback(result, false);
+                return;
+            }
         }
         callback(result, true);
         return;
@@ -76,46 +81,74 @@ function unitiWirelessLookup(address, callback) {
     });
 }
 
+// Try to get formatted address via TPG
+function tpgAddressFind(address, callback) {
+    var url = "https://www.tpg.com.au/api/sq?term=" + address;
+
+    var result = {};
+
+    request(url, function (error, response, body) {
+        if (error) {
+            callback(result, false);
+            return;
+        }
+        try {
+            body = JSON.parse(body);
+            result.address = body[0].replace(/\s+/g,' ');
+            callback(result, true);
+            return;
+        } catch (e) {
+            callback(result, false);
+            return;
+        }
+    });
+}
+
 app.get("/check", (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     var address = req.query.address;
     var result = {}
 
-    nbnAutoComplete(address, function(data, success) {
+    tpgAddressFind(address, function(data, success) {
         if (success) {
-            result = data;
-            myRepublicLookup(result.locid, function(data, success) {
-                if (success && data.class != "0" && data.class != "4" && data.class != "10" && data.class != "30") {
-                    result.body = data;
-                    res.send(result);
-                } else { // NBN not available at address
-                    unitiWirelessLookup(address, function(data, success) {
-                        if (success) {
-                            result.unitiid = data.id;
-                            result.body = {};
-                            if (data.carrier == "OC") {
-                                result.body.provider = "Private Network";
-                                result.body.primaryAccessTechnology = "Fibre";
-                                result.body.lowerSpeed = 100;
-                                result.body.upperSpeed = 1000;
-                                result.body.networkCoexistence = "";
-                                res.send(result);
+            address = data.address
+        }
+        nbnAutoComplete(address, function(data, success) {
+            if (success) {
+                result = data;
+                myRepublicLookup(result.locid, function(data, success) {
+                    if (success && data.class != "0" && data.class != "4" && data.class != "10" && data.class != "30") {
+                        result.body = data;
+                        res.send(result);
+                    } else { // NBN not available at address
+                        unitiWirelessLookup(address, function(data, success) {
+                            if (success) {
+                                result.unitiid = data.id;
+                                result.body = {};
+                                if (data.carrier == "OC") {
+                                    result.body.provider = "Private Network";
+                                    result.body.primaryAccessTechnology = "Fibre";
+                                    result.body.lowerSpeed = 100;
+                                    result.body.upperSpeed = 1000;
+                                    result.body.networkCoexistence = "";
+                                    res.send(result);
+                                } else {
+                                    res.status(400);
+                                    res.send('Could not find match');
+                                }
                             } else {
                                 res.status(400);
                                 res.send('Could not find match');
                             }
-                        } else {
-                            res.status(400);
-                            res.send('Could not find match');
-                        }
-                    })
-                }
-            });
-        } else { // NBN could not match address
-            res.status(400);
-            res.send('Could not find match');
-        }      
-    });
+                        })
+                    }
+                });
+            } else { // NBN could not match address
+                res.status(400);
+                res.send('Could not find match');
+            }      
+        });
+    })
 });
 
 app.listen(3000);
