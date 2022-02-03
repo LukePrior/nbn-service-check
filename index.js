@@ -4,7 +4,7 @@ var app = express();
 
 // Try to get a locID from address string via NBN
 function nbnAutoComplete(address, callback) {
-    var url = "https://places.nbnco.net.au/places/v1/autocomplete?query=" + address;
+    var url = "https://places.nbnco.net.au/places/v1/autocomplete?query=" + encodeURIComponent(address);
 
     var result = {};
 
@@ -38,8 +38,7 @@ function nbnAutoComplete(address, callback) {
     function tpgAddressTry() {
         tpgAddressFind(address, function(data, success) {
             if (success) {
-                var tpgurl = "https://places.nbnco.net.au/places/v1/autocomplete?query=" + data.address;
-                console.log(tpgurl);
+                var tpgurl = "https://places.nbnco.net.au/places/v1/autocomplete?query=" + encodeURIComponent(data.address);
                 request(tpgurl, {headers: {"Referer": "https://www.nbnco.com.au/when-do-i-get-it/rollout-map.html"}}, function (error, response, body) { 
                     if (error) {
                         callback(result, false);
@@ -73,7 +72,7 @@ function nbnAutoComplete(address, callback) {
 
 // Try to get premesise information from locID via MyRepublic
 function myRepublicLookup(locID, callback) {
-    var url = "https://order.au.myrepublic.net/address/info?address=" + locID;
+    var url = "https://order.au.myrepublic.net/address/info?address=" + encodeURIComponent(locID);
 
     var result = {};
 
@@ -96,7 +95,7 @@ function myRepublicLookup(locID, callback) {
 
 // Try to get premesise id via Uniti Wireless
 function unitiWirelessLookup(address, callback) {
-    var url = "https://service-qualification.unitiwireless.com/api/v1/autocomplete?address=" + address;
+    var url = "https://service-qualification.unitiwireless.com/api/v1/autocomplete?address=" + encodeURIComponent(address);
 
     var result = {};
 
@@ -121,7 +120,7 @@ function unitiWirelessLookup(address, callback) {
 
 // Try to get formatted address via TPG
 function tpgAddressFind(address, callback) {
-    var url = "https://www.tpg.com.au/api/sq?term=" + address;
+    var url = "https://www.tpg.com.au/api/sq?term=" + encodeURIComponent(address);
 
     var result = {};
 
@@ -191,7 +190,8 @@ app.get("/check", (req, res) => {
                             result = data;
                             res.send(result);
                         } else {
-                            res.status(400);
+                            console.error("Could not find match");
+                            res.status(404);
                             res.send('Could not find match');
                         }
                     });
@@ -203,7 +203,8 @@ app.get("/check", (req, res) => {
                     result = data;
                     res.send(result);
                 } else {
-                    res.status(400);
+                    console.error("Could not find match");
+                    res.status(404);
                     res.send('Could not find match');
                 }
             });
