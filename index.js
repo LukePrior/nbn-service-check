@@ -177,6 +177,8 @@ app.get("/check", (req, res) => {
     var address = req.query.address;
     var result = {}
 
+    console.log(req.get('Referrer'));
+
     nbnAutoComplete(address, function(data, success) {
         if (success) {
             result = data;
