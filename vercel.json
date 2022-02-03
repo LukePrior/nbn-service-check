@@ -1,6 +1,6 @@
 {
     "functions": {
-      "api/index.js": {
+      "api/check.js": {
         "memory": 256
       }
     },
