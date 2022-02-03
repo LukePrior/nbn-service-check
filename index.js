@@ -190,7 +190,7 @@ app.get("/check", (req, res) => {
                             result = data;
                             res.send(result);
                         } else {
-                            console.error("Could not find match");
+                            console.error("Could not find match: " + req.get('Referrer'));
                             res.status(404);
                             res.send('Could not find match');
                         }
@@ -203,7 +203,7 @@ app.get("/check", (req, res) => {
                     result = data;
                     res.send(result);
                 } else {
-                    console.error("Could not find match");
+                    console.error("Could not find match: " + req.get('Referrer'));
                     res.status(404);
                     res.send('Could not find match');
                 }
