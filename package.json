@@ -9,7 +9,8 @@
     "request": "^2.88.2"
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "vercel dev",
+    "deploy": "vercel deploy --prod"
   },
   "author": "Luke Prior",
   "license": "MIT"
