@@ -1,6 +1,6 @@
 {
     "functions": {
-      "api/index.ts": {
+      "api/check.ts": {
         "memory": 256
       }
     }
