@@ -144,8 +144,26 @@ app.get("/check", (req, res) => {
                     }
                 });
             } else { // NBN could not match address
-                res.status(400);
-                res.send('Could not find match');
+                unitiWirelessLookup(address, function(data, success) {
+                    if (success) {
+                        result.unitiid = data.id;
+                        result.body = {};
+                        if (data.carrier == "OC") {
+                            result.body.provider = "Private Network";
+                            result.body.primaryAccessTechnology = "Fibre";
+                            result.body.lowerSpeed = 100;
+                            result.body.upperSpeed = 1000;
+                            result.body.networkCoexistence = "";
+                            res.send(result);
+                        } else {
+                            res.status(400);
+                            res.send('Could not find match');
+                        }
+                    } else {
+                        res.status(400);
+                        res.send('Could not find match');
+                    }
+                })
             }      
         });
     })
