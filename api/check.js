@@ -1,4 +1,5 @@
 var request = require('request');
+var express = require('express');
 
 // Try to get a locID from address string via NBN
 function nbnAutoComplete(address, callback) {
