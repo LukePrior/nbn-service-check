@@ -1,5 +1,6 @@
 {
     "version": 2,
     "builds": [{ "src": "index.js", "use": "@now/node-server" }],
-    "rewrites": [{ "source": "/check", "destination": "/api/check"}]
+    "rewrites": [{ "source": "/check", "destination": "/api/check"}],
+    "redirects": [{ "source": "/check", "destination": "/api/check", "permanent": false }]
   }
