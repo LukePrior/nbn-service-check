@@ -1,0 +1,13 @@
+{
+    "functions": {
+      "api/check.js": {
+        "memory": 256
+      }
+    },
+    "redirects": [
+      { 
+        "source": "/check",
+        "destination": "/api/check"
+      }
+    ]
+}
