@@ -104,6 +104,37 @@ function tpgAddressFind(address, callback) {
     });
 }
 
+function unitiwirelessProcess(address, callback) {
+    unitiWirelessLookup(address, function(data, success) {
+        var result = {};
+        if (success) {
+            result.unitiid = data.id;
+            result.label = data.address;
+            result.body = {};
+            if (data.carrier == "OC") {
+                result.body.provider = "Private Network";
+                result.body.primaryAccessTechnology = "Fibre";
+                result.body.lowerSpeed = 100;
+                result.body.upperSpeed = 1000;
+                result.body.networkCoexistence = "";
+                callback(result, true);
+                return;
+            } else if (data.carrier == "NB") {
+                result.body.provider = "NBN";
+                result.body.primaryAccessTechnology = "Unknown";
+                result.body.networkCoexistence = "";
+                callback(result, true);
+                return;
+            } 
+            callback(result, false);
+            return;
+        } else {
+            callback(result, false);
+            return;
+        }
+    })
+}
+
 app.get("/check", (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     var address = req.query.address;
@@ -120,50 +151,28 @@ app.get("/check", (req, res) => {
                     if (success && data.class != "0" && data.class != "4" && data.class != "10" && data.class != "30") {
                         result.body = data;
                         res.send(result);
-                    } else { // NBN not available at address
-                        unitiWirelessLookup(address, function(data, success) {
+                    } else { // NBN not found at address
+                        unitiwirelessProcess(address, function(data, success) {
                             if (success) {
-                                result.unitiid = data.id;
-                                result.body = {};
-                                if (data.carrier == "OC") {
-                                    result.body.provider = "Private Network";
-                                    result.body.primaryAccessTechnology = "Fibre";
-                                    result.body.lowerSpeed = 100;
-                                    result.body.upperSpeed = 1000;
-                                    result.body.networkCoexistence = "";
-                                    res.send(result);
-                                } else {
-                                    res.status(400);
-                                    res.send('Could not find match');
-                                }
+                                result = data;
+                                res.send(result);
                             } else {
                                 res.status(400);
                                 res.send('Could not find match');
                             }
-                        })
+                        });
                     }
                 });
-            } else { // NBN could not match address
-                unitiWirelessLookup(address, function(data, success) {
+            } else { // NBN not found at address
+                unitiwirelessProcess(address, function(data, success) {
                     if (success) {
-                        result.unitiid = data.id;
-                        result.body = {};
-                        if (data.carrier == "OC") {
-                            result.body.provider = "Private Network";
-                            result.body.primaryAccessTechnology = "Fibre";
-                            result.body.lowerSpeed = 100;
-                            result.body.upperSpeed = 1000;
-                            result.body.networkCoexistence = "";
-                            res.send(result);
-                        } else {
-                            res.status(400);
-                            res.send('Could not find match');
-                        }
+                        result = data;
+                        res.send(result);
                     } else {
                         res.status(400);
                         res.send('Could not find match');
                     }
-                })
+                });
             }      
         });
     })
