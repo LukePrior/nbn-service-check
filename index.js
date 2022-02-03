@@ -10,27 +10,65 @@ function nbnAutoComplete(address, callback) {
 
     request(url, {headers: {"Referer": "https://www.nbnco.com.au/when-do-i-get-it/rollout-map.html"}}, function (error, response, body) { 
         if (error) {
-            callback(result, false);
+            tpgAddressTry();
             return;
         }
         try {
             body = JSON.parse(body);
         } catch (e) {
-            callback(result, false);
+            tpgAddressTry();
             return;
         }
         if (body.suggestions.length != 0) {
             if (body.suggestions[0].id.startsWith("LOC")) {
                 result.label = body.suggestions[0].formattedAddress;
                 result.locid = body.suggestions[0].id;
+                callback(result, true);
+                return;
             } else {
-                callback(result, false);
+                tpgAddressTry();
                 return;
             }
+        } else {
+            tpgAddressTry();
+            return;
         }
-        callback(result, true);
-        return;
     });
+
+    function tpgAddressTry() {
+        tpgAddressFind(address, function(data, success) {
+            if (success) {
+                var tpgurl = "https://places.nbnco.net.au/places/v1/autocomplete?query=" + data.address;
+                console.log(tpgurl);
+                request(tpgurl, {headers: {"Referer": "https://www.nbnco.com.au/when-do-i-get-it/rollout-map.html"}}, function (error, response, body) { 
+                    if (error) {
+                        callback(result, false);
+                        return;
+                    }
+                    try {
+                        body = JSON.parse(body);
+                    } catch (e) {
+                        callback(result, false);
+                        return;
+                    }
+                    if (body.suggestions.length != 0) {
+                        if (body.suggestions[0].id.startsWith("LOC")) {
+                            result.label = body.suggestions[0].formattedAddress;
+                            result.locid = body.suggestions[0].id;
+                        } else {
+                            callback(result, false);
+                            return;
+                        }
+                    }
+                    callback(result, true);
+                    return;
+                });
+            } else {
+                callback(result, true);
+                return;
+            }
+        });
+    }
 }
 
 // Try to get premesise information from locID via MyRepublic
@@ -140,42 +178,37 @@ app.get("/check", (req, res) => {
     var address = req.query.address;
     var result = {}
 
-    tpgAddressFind(address, function(data, success) {
+    nbnAutoComplete(address, function(data, success) {
         if (success) {
-            address = data.address
-        }
-        nbnAutoComplete(address, function(data, success) {
-            if (success) {
-                result = data;
-                myRepublicLookup(result.locid, function(data, success) {
-                    if (success && data.class != "0" && data.class != "4" && data.class != "10" && data.class != "30") {
-                        result.body = data;
-                        res.send(result);
-                    } else { // NBN not found at address
-                        unitiwirelessProcess(address, function(data, success) {
-                            if (success) {
-                                result = data;
-                                res.send(result);
-                            } else {
-                                res.status(400);
-                                res.send('Could not find match');
-                            }
-                        });
-                    }
-                });
-            } else { // NBN not found at address
-                unitiwirelessProcess(address, function(data, success) {
-                    if (success) {
-                        result = data;
-                        res.send(result);
-                    } else {
-                        res.status(400);
-                        res.send('Could not find match');
-                    }
-                });
-            }      
-        });
-    })
+            result = data;
+            myRepublicLookup(result.locid, function(data, success) {
+                if (success && data.class != "0" && data.class != "4" && data.class != "10" && data.class != "30") {
+                    result.body = data;
+                    res.send(result);
+                } else { // NBN not found at address
+                    unitiwirelessProcess(address, function(data, success) {
+                        if (success) {
+                            result = data;
+                            res.send(result);
+                        } else {
+                            res.status(400);
+                            res.send('Could not find match');
+                        }
+                    });
+                }
+            });
+        } else { // NBN not found at address
+            unitiwirelessProcess(address, function(data, success) {
+                if (success) {
+                    result = data;
+                    res.send(result);
+                } else {
+                    res.status(400);
+                    res.send('Could not find match');
+                }
+            });
+        }      
+    });
 });
 
 app.listen(3000);
