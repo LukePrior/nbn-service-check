@@ -4,7 +4,7 @@
     "routes": [
       {
         "src": "/check",
-        "dest": "/api/index.js",
+        "dest": "index.js",
         "methods": ["GET"]
       }
     ]
