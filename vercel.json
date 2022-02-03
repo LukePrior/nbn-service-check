@@ -3,5 +3,6 @@
 		"api/check.js": {
 			"memory": 128
 		}
-	}
+	},
+    "rewrites": [{ "source": "/check", "destination": "/api/check"}]
 }
