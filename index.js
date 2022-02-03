@@ -1,5 +1,6 @@
 var express = require('express');
 var request = require('request');
+var app = express();
 
 // Try to get a locID from address string via NBN
 function nbnAutoComplete(address, callback) {
@@ -171,7 +172,7 @@ function unitiwirelessProcess(address, callback) {
     })
 }
 
-module.exports = function check(req, res) {
+app.get("/check", (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     var address = req.query.address;
     var result = {}
@@ -209,4 +210,6 @@ module.exports = function check(req, res) {
             });
         }      
     });
-};
+});
+
+app.listen(3000);
