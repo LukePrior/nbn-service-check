@@ -85,7 +85,7 @@ app.get("/check", (req, res) => {
         if (success) {
             result = data;
             myRepublicLookup(result.locid, function(data, success) {
-                if (success) {
+                if (success && data.class != "0" && data.class != "4" && data.class != "10" && data.class != "30") {
                     result.body = data;
                     res.send(result);
                 } else { // NBN not available at address
