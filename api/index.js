@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 var express = require('express');
 var request = require('request');
 
@@ -173,7 +171,7 @@ function unitiwirelessProcess(address, callback) {
     })
 }
 
-export default (req, res) => {
+module.exports = function check(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     var address = req.query.address;
     var result = {}
