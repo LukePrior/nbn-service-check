@@ -1,6 +1,4 @@
-var express = require('express');
 var request = require('request');
-var app = express();
 
 // Try to get a locID from address string via NBN
 function nbnAutoComplete(address, callback) {
@@ -172,12 +170,10 @@ function unitiwirelessProcess(address, callback) {
     })
 }
 
-app.get("/check", (req, res) => {
+module.exports = function check (req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     var address = req.query.address;
     var result = {}
-
-    console.log(req.get('Referrer'));
 
     nbnAutoComplete(address, function(data, success) {
         if (success) {
@@ -192,7 +188,7 @@ app.get("/check", (req, res) => {
                             result = data;
                             res.send(result);
                         } else {
-                            console.error("Could not find match: " + req.get('Referrer'));
+                            console.error("Could not find match");
                             res.status(404);
                             res.send('Could not find match');
                         }
@@ -205,13 +201,11 @@ app.get("/check", (req, res) => {
                     result = data;
                     res.send(result);
                 } else {
-                    console.error("Could not find match: " + req.get('Referrer'));
+                    console.error("Could not find match");
                     res.status(404);
                     res.send('Could not find match');
                 }
             });
         }      
     });
-});
-
-app.listen(3000);
+};
