@@ -1,4 +1,25 @@
 var request = require('request');
+var isbot = require('isbot')
+const express = require('express')
+const hostValidation = require('host-validation')
+
+const app = express()
+
+// Only allow requests from supported sites
+app.use(hostValidation({ referers: [/.*\.realestate\.com.au$/, 
+    /.*\.domain\.com.au$/, 
+    /.*\.realestateview\.com.au$/, 
+    /.*\.onthehouse\.com.au$/, 
+    /.*\.allhomes\.com.au$/, 
+    /.*\.rent\.com.au$/, 
+    /reiwa\.com.au$/, 
+    /.*\.homely\.com.au$/, 
+    /.*\.realcommercial\.com.au$/, 
+    /.*\.commercialrealestate\.com.au$/
+],
+fail: (req, res, next) => {
+    res.status(403).send('Sorry no bots please host your own version: https://github.com/LukePrior/nbn-service-check')
+} }))
 
 // Try to get a locID from address string via NBN
 function nbnAutoComplete(address, callback) {
@@ -170,42 +191,65 @@ function unitiwirelessProcess(address, callback) {
     })
 }
 
-module.exports = function check (req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    var address = req.query.address;
-    var result = {}
+function checkBot(req, callback) {
+    if (isbot(req.get('user-agent'))) {
+        callback(true);
+        return;
+    } else if (req.get('Referrer')){
+        callback(false);
+        return;
+    }
+}
 
-    nbnAutoComplete(address, function(data, success) {
-        if (success) {
-            result = data;
-            myRepublicLookup(result.locid, function(data, success) {
-                if (success && data.class != "0" && data.class != "4" && data.class != "10" && data.class != "30") {
-                    result.body = data;
-                    res.send(result);
-                } else { // NBN not found at address
-                    unitiwirelessProcess(address, function(data, success) {
-                        if (success) {
-                            result = data;
-                            res.send(result);
-                        } else {
-                            console.error("Could not find match");
-                            res.status(404);
-                            res.send('Could not find match');
-                        }
-                    });
-                }
-            });
-        } else { // NBN not found at address
-            unitiwirelessProcess(address, function(data, success) {
-                if (success) {
-                    result = data;
-                    res.send(result);
-                } else {
-                    console.error("Could not find match");
-                    res.status(404);
-                    res.send('Could not find match');
-                }
-            });
-        }      
+app.get('/check', (req, res) => {
+    checkBot(req, function(bot) {
+        if (bot) {
+            res.status(403);
+            res.send('Sorry no bots please host your own version: https://github.com/LukePrior/nbn-service-check');
+        } else {
+            processRequest();
+        }
     });
-};
+
+    function processRequest() {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        var address = req.query.address;
+        var result = {}
+    
+        nbnAutoComplete(address, function(data, success) {
+            if (success) {
+                result = data;
+                myRepublicLookup(result.locid, function(data, success) {
+                    if (success && data.class != "0" && data.class != "4" && data.class != "10" && data.class != "30") {
+                        result.body = data;
+                        res.send(result);
+                    } else { // NBN not found at address
+                        unitiwirelessProcess(address, function(data, success) {
+                            if (success) {
+                                result = data;
+                                res.send(result);
+                            } else {
+                                console.error("Could not find match");
+                                res.status(404);
+                                res.send('Could not find match');
+                            }
+                        });
+                    }
+                });
+            } else { // NBN not found at address
+                unitiwirelessProcess(address, function(data, success) {
+                    if (success) {
+                        result = data;
+                        res.send(result);
+                    } else {
+                        console.error("Could not find match");
+                        res.status(404);
+                        res.send('Could not find match');
+                    }
+                });
+            }      
+        });
+    }
+});
+
+module.exports = app;
