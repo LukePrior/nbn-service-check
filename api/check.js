@@ -16,7 +16,10 @@ app.use(hostValidation({ hosts: [/.*\.realestate\.com.au$/,
     /.*\.homely\.com.au$/, 
     /.*\.realcommercial\.com.au$/, 
     /.*\.commercialrealestate\.com.au$/
-] }))
+],
+fail: (req, res, next) => {
+    res.status(403).send('Sorry no bots please host your own version: https://github.com/LukePrior/nbn-service-check')
+} }))
 
 // Try to get a locID from address string via NBN
 function nbnAutoComplete(address, callback) {
