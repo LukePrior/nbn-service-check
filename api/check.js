@@ -183,7 +183,7 @@ function checkBot(req, callback) {
     }
 }
 
-app.get('/', (req, res) => {
+app.get('/check', (req, res) => {
     checkBot(req, function(bot) {
         if (bot) {
             res.status(403);
