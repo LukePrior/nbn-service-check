@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "request": "^2.88.2",
-    "isbot": "^3.4.1"
+    "isbot": "^3.4.1",
+    "request": "^2.88.2"
   },
   "scripts": {
     "start": "vercel dev",

@@ -172,7 +172,7 @@ function unitiwirelessProcess(address, callback) {
 }
 
 function checkBot(req, callback) {
-    if (isbot(req.get('user-agent'))) {
+    if (isbot(req.getHeader('User-Agent'))) {
         callback(true);
         return;
     } else {
