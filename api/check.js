@@ -1,5 +1,7 @@
 var request = require('request');
 var isbot = require('isbot')
+const express = require('express')
+const app = express()
 
 // Try to get a locID from address string via NBN
 function nbnAutoComplete(address, callback) {
@@ -172,7 +174,7 @@ function unitiwirelessProcess(address, callback) {
 }
 
 function checkBot(req, callback) {
-    if (isbot(req.getHeader('User-Agent'))) {
+    if (isbot(req.get('user-agent'))) {
         callback(true);
         return;
     } else {
@@ -181,7 +183,7 @@ function checkBot(req, callback) {
     }
 }
 
-module.exports = function check (req, res) {
+app.get('/', (req, res) => {
     checkBot(req, function(bot) {
         if (bot) {
             res.status(403);
@@ -230,4 +232,6 @@ module.exports = function check (req, res) {
             }      
         });
     }
-};
+});
+
+module.exports = app;
