@@ -6,7 +6,7 @@ const hostValidation = require('host-validation')
 const app = express()
 
 // Only allow requests from supported sites
-app.use(hostValidation({ hosts: [/.*\.realestate\.com.au$/, 
+app.use(hostValidation({ referers: [/.*\.realestate\.com.au$/, 
     /.*\.domain\.com.au$/, 
     /.*\.realestateview\.com.au$/, 
     /.*\.onthehouse\.com.au$/, 
