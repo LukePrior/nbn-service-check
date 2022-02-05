@@ -1,7 +1,22 @@
 var request = require('request');
 var isbot = require('isbot')
 const express = require('express')
+const hostValidation = require('host-validation')
+
 const app = express()
+
+// Only allow requests from supported sites
+app.use(hostValidation({ hosts: [/.*\.realestate\.com.au$/, 
+    /.*\.domain\.com.au$/, 
+    /.*\.realestateview\.com.au$/, 
+    /.*\.onthehouse\.com.au$/, 
+    /.*\.allhomes\.com.au$/, 
+    /.*\.rent\.com.au$/, 
+    /reiwa\.com.au$/, 
+    /.*\.homely\.com.au$/, 
+    /.*\.realcommercial\.com.au$/, 
+    /.*\.commercialrealestate\.com.au$/
+] }))
 
 // Try to get a locID from address string via NBN
 function nbnAutoComplete(address, callback) {
@@ -177,7 +192,7 @@ function checkBot(req, callback) {
     if (isbot(req.get('user-agent'))) {
         callback(true);
         return;
-    } else {
+    } else if (req.get('Referrer')){
         callback(false);
         return;
     }
