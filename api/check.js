@@ -1,4 +1,5 @@
 var request = require('request');
+var isbot = require('isbot')
 
 // Try to get a locID from address string via NBN
 function nbnAutoComplete(address, callback) {
@@ -170,42 +171,63 @@ function unitiwirelessProcess(address, callback) {
     })
 }
 
-module.exports = function check (req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    var address = req.query.address;
-    var result = {}
+function checkBot(req, callback) {
+    if (isbot(req.get('user-agent'))) {
+        callback(true);
+        return;
+    } else {
+        callback(false);
+        return;
+    }
+}
 
-    nbnAutoComplete(address, function(data, success) {
-        if (success) {
-            result = data;
-            myRepublicLookup(result.locid, function(data, success) {
-                if (success && data.class != "0" && data.class != "4" && data.class != "10" && data.class != "30") {
-                    result.body = data;
-                    res.send(result);
-                } else { // NBN not found at address
-                    unitiwirelessProcess(address, function(data, success) {
-                        if (success) {
-                            result = data;
-                            res.send(result);
-                        } else {
-                            console.error("Could not find match");
-                            res.status(404);
-                            res.send('Could not find match');
-                        }
-                    });
-                }
-            });
-        } else { // NBN not found at address
-            unitiwirelessProcess(address, function(data, success) {
-                if (success) {
-                    result = data;
-                    res.send(result);
-                } else {
-                    console.error("Could not find match");
-                    res.status(404);
-                    res.send('Could not find match');
-                }
-            });
-        }      
+module.exports = function check (req, res) {
+    checkBot(req, function(bot) {
+        if (bot) {
+            res.status(403);
+            res.send('Sorry no bots please host your own version: https://github.com/LukePrior/nbn-service-check');
+        } else {
+            processRequest();
+        }
     });
+
+    function processRequest() {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        var address = req.query.address;
+        var result = {}
+    
+        nbnAutoComplete(address, function(data, success) {
+            if (success) {
+                result = data;
+                myRepublicLookup(result.locid, function(data, success) {
+                    if (success && data.class != "0" && data.class != "4" && data.class != "10" && data.class != "30") {
+                        result.body = data;
+                        res.send(result);
+                    } else { // NBN not found at address
+                        unitiwirelessProcess(address, function(data, success) {
+                            if (success) {
+                                result = data;
+                                res.send(result);
+                            } else {
+                                console.error("Could not find match");
+                                res.status(404);
+                                res.send('Could not find match');
+                            }
+                        });
+                    }
+                });
+            } else { // NBN not found at address
+                unitiwirelessProcess(address, function(data, success) {
+                    if (success) {
+                        result = data;
+                        res.send(result);
+                    } else {
+                        console.error("Could not find match");
+                        res.status(404);
+                        res.send('Could not find match');
+                    }
+                });
+            }      
+        });
+    }
 };
