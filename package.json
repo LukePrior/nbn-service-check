@@ -5,7 +5,6 @@
   "main": "index.js",
   "dependencies": {
     "express": "^4.17.2",
-    "host-validation": "^2.0.1",
     "isbot": "^3.4.1",
     "request": "^2.88.2"
   },
