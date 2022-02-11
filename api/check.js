@@ -27,14 +27,10 @@ function nbnAutoComplete(address, callback) {
                 result.locid = body.suggestions[0].id;
                 callback(result, true);
                 return;
-            } else {
-                tpgAddressTry();
-                return;
             }
-        } else {
-            tpgAddressTry();
-            return;
-        }
+        } 
+        tpgAddressTry();
+        return;
     });
 
     function tpgAddressTry() {
@@ -56,16 +52,15 @@ function nbnAutoComplete(address, callback) {
                         if (body.suggestions[0].id.startsWith("LOC")) {
                             result.label = body.suggestions[0].formattedAddress;
                             result.locid = body.suggestions[0].id;
-                        } else {
-                            callback(result, false);
+                            callback(result, true);
                             return;
                         }
-                    }
-                    callback(result, true);
+                    } 
+                    callback(result, false);
                     return;
                 });
             } else {
-                callback(result, true);
+                callback(result, false);
                 return;
             }
         });
