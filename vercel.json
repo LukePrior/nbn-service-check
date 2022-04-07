@@ -4,5 +4,11 @@
 			"memory": 128
 		}
 	},
-    "rewrites": [{ "source": "/check", "destination": "/api/check"}]
+    	"rewrites": [{ "source": "/check", "destination": "/api/check"}],
+	"redirects": [
+		{
+			"source": "/check",
+			"destination": "https://nbn-service-check.deta.dev/check"
+		}
+	]
 }
