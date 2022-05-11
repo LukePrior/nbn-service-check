@@ -84,6 +84,10 @@ function myRepublicLookup(locID, callback) {
             callback(result, false);
             return;
         }
+        if (result.length == 1) {
+            callback(result, false);
+            return;
+        }
         result = body;
         callback(result, true);
         return;
