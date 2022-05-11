@@ -84,10 +84,6 @@ function myRepublicLookup(locID, callback) {
             callback(result, false);
             return;
         }
-        if (body.length == 1) {
-            callback(result, false);
-            return;
-        }
         result = body;
         callback(result, true);
         return;
@@ -202,7 +198,7 @@ app.get('/check', (req, res) => {
             if (success) {
                 result = data;
                 myRepublicLookup(result.locid, function(data, success) {
-                    if (success && data.class != "0" && data.class != "4" && data.class != "10" && data.class != "30") {
+                    if (success && data.class != "0" && data.class != "4" && data.class != "10" && data.class != "30" && data.technology !== null) {
                         result.body = data;
                         res.send(result);
                     } else { // NBN not found at address
