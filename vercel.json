@@ -1,8 +1,15 @@
 {
-	"functions": {
-		"api/check.js": {
-			"memory": 128
-		}
-	},
-    "rewrites": [{ "source": "/check", "destination": "/api/check"}]
+	"version": 2,
+	"builds": [
+	  {
+		"src": "index.js",
+		"use": "@now/node"
+	  }
+	],
+	"routes": [
+	  {
+		"src": "/(.*)",
+		"dest": "index.js"
+	  }
+	]
 }

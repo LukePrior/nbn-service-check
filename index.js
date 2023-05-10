@@ -1,8 +1,6 @@
 var request = require('request');
 var isbot = require('isbot')
-const express = require('express')
-
-const app = express()
+const app = require('express')()
 
 // Try to get a locID from address string via NBN
 function nbnAutoComplete(address, callback) {
@@ -88,15 +86,25 @@ app.get('/check', (req, res) => {
                 launtelLookup(result.locid, function(data, success) {
                     if (success && data.ServiceClass != "0" && data.ServiceClass != "4" && data.ServiceClass != "10" && data.ServiceClass != "30") {
                         result.body = data;
+                        console.log(result);
+                        res.send(result);
+                        return;
+                    } else {
                         res.send(result);
                         return;
                     }
                 });
-            }   
-            res.status(404);
-            res.send('Could not find match');
+            } else {
+                res.send(result);
+                return;
+            }
+            
         });
     }
+});
+
+app.listen(5000, () => {
+    console.log("Running on port 5000.");
 });
 
 module.exports = app;
