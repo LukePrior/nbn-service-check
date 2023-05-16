@@ -85,7 +85,15 @@ app.get('/check', (req, res) => {
                 result = data;
                 launtelLookup(result.locid, function(data, success) {
                     if (success && data.ServiceClass != "0" && data.ServiceClass != "4" && data.ServiceClass != "10" && data.ServiceClass != "30") {
-                        result.body = data;
+                        result.body = {};
+                        result.body.provider = "NBN";
+                        result.body.primaryAccessTechnology = data.loc_details['primary-access-technology']
+                        if (data.loc_details['co-existence'] != "No") {
+                            result.body.networkCoexistence = "Yes"
+                        }
+                        if (data.loc_details.newdevcharge != "") {
+                            result.body.NewDevelopmentCharge = data.loc_details.newdevcharge
+                        }
                         console.log(result);
                         res.send(result);
                         return;
