@@ -94,7 +94,10 @@ app.get('/check', (req, res) => {
                         if (data.loc_details.newdevcharge != "") {
                             result.body.NewDevelopmentCharge = data.loc_details.newdevcharge
                         }
-                        console.log(result);
+                        if (data.loc_details.hasOwnProperty('pairlist')) {
+                            result.body.upperSpeed = data.loc_details.pairlist[0].tc4Down.split(" ")[0]
+                            result.body.lowerSpeed = data.loc_details.pairlist[0].tc4Down.split(" ")[3]
+                        }
                         res.send(result);
                         return;
                     } else {
