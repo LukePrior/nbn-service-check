@@ -1,3 +1,7 @@
+# NOTE: The Launtel API has been disabled and as a result this wrapper will not function and has been archived
+
+Refer to this map for latest NBN information: https://github.com/LukePrior/nbn-upgrade-map
+
 # NBN Service Check API
 
 This is an unnofficial API that can return the NBN availability information for properties including technology type, maximum line speed, and co-existance status if available.
